@@ -19,7 +19,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     sizes = ProductSizeSerializers(many=True, read_only=True, source='size')
-
+    categories = serializers.SlugRelatedField(
+            many=True, 
+            read_only=True, 
+            slug_field='name'  # ชื่อฟิลด์ที่ต้องการให้แสดงผล
+        )
     class Meta:
         model = Product
-        fields = ['name', 'description', 'brand', 'price', 'color', 'amount', 'categories', 'image', 'sizes', 'images']
+        fields = ['id', 'name', 'description', 'brand', 'price', 'color', 'amount', 'categories', 'image', 'sizes', 'images']
