@@ -1,6 +1,11 @@
 from .models import *
 from rest_framework import serializers
 
+class CustomerSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['first_name', 'last_name', 'birthdate', 'email', 'phone', 'username', 'password', 'gender']
+
 class ProductSizeSerializers(serializers.ModelSerializer):
     class Meta:
         model = ProductSize

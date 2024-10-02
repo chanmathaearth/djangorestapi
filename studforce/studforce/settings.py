@@ -53,10 +53,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://localhost:5174",
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "studforce.urls"
 
@@ -87,9 +84,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'studforce_db',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': 'bunnyz2710',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
