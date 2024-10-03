@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from .serializers import *
-from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password
 
-class CustomerList(APIView):
+class CustomerRegList(APIView):
 
     def post(self, request):
         serializer = CustomerSerializers(data=request.data)
@@ -14,8 +15,22 @@ class CustomerList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            print(serializer.errors)  # เพิ่มบรรทัดนี้เพื่อตรวจสอบข้อผิดพลาด
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CustomerLoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        try:
+            customer = Customer.objects.get(username=username)
+        except Customer.DoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if check_password(password, customer.password):
+            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
 class ProductList(APIView):
 
