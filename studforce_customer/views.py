@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,6 +6,7 @@ from .models import *
 from .serializers import *
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth import authenticate
 
 class ProductList(APIView):
     def get(self, request):
@@ -87,6 +88,10 @@ class ProductList(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class CustomerRegList(APIView):
+    def get(self, request):
+        customer = Customer.objects.all()
+        serializer = CustomerSerializers(customer, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = CustomerSerializers(data=request.data)
@@ -101,12 +106,20 @@ class CustomerLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        try:
-            customer = Customer.objects.get(username=username)
-        except Customer.DoesNotExist:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        user = authenticate(username=username, password=password)
 
-        if check_password(password, customer.password):
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        if user:
+            if user.is_superuser:
+                return Response({'message': 'Login successful', 'role': 'admin'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
         else:
+            try:
+                customer = Customer.objects.get(username=username)
+                if check_password(password, customer.password):
+                    return Response({'message': 'Login successful', 'role': 'customer', 'user_id': customer.id, 'username': customer.username}, status=status.HTTP_200_OK)
+            except Customer.DoesNotExist:
+                pass
+
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
