@@ -5,10 +5,15 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate
 
 class CustomerRegList(APIView):
 
+    def get(self, request):
+        customer = Customer.objects.all()
+        serializer = CustomerSerializers(customer, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
     def post(self, request):
         serializer = CustomerSerializers(data=request.data)
         if serializer.is_valid():
@@ -22,15 +27,22 @@ class CustomerLoginView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        try:
-            customer = Customer.objects.get(username=username)
-        except Customer.DoesNotExist:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_superuser:
+                return Response({'message': 'Superuser login successful'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        else:    
+            try:
+                customer = Customer.objects.get(username=username)
+            except Customer.DoesNotExist:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if check_password(password, customer.password):
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            if check_password(password, customer.password):
+                return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
 class ProductList(APIView):
 
