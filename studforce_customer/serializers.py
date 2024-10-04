@@ -1,5 +1,14 @@
 from .models import *
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
+
+class CustomerSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['first_name', 'last_name', 'birthdate', 'email', 'phone', 'username', 'password', 'gender']
+    
+    def validate_password(self, value):
+        return make_password(value)
 
 class ProductSizeSerializers(serializers.ModelSerializer):
     class Meta:
@@ -17,7 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
     categories = serializers.SlugRelatedField(
             many=True, 
             read_only=True, 
-            slug_field='name'  # ชื่อฟิลด์ที่ต้องการให้แสดงผล
+            slug_field='name'
         )
     class Meta:
         model = Product

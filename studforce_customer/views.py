@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import check_password
 
 class ProductList(APIView):
     def get(self, request):
@@ -84,3 +85,28 @@ class ProductList(APIView):
         product = get_object_or_404(Product, pk=pk)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CustomerRegList(APIView):
+
+    def post(self, request):
+        serializer = CustomerSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CustomerLoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        try:
+            customer = Customer.objects.get(username=username)
+        except Customer.DoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if check_password(password, customer.password):
+            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
