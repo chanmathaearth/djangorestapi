@@ -1,33 +1,35 @@
-from .models import *
 from rest_framework import serializers
-from django.contrib.auth.hashers import make_password
+from .models import CustomerAddress, Order, ProductOrder, Cart
+from studforce_auth.models import Customer
 
-class CustomerSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = ['first_name', 'last_name', 'birthdate', 'email', 'phone', 'username', 'password', 'gender']
-    
-    def validate_password(self, value):
-        return make_password(value)
+from studforce_product.serializers import ProductSerializer
 
-class ProductSizeSerializers(serializers.ModelSerializer):
+class CustomerAddressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductSize
-        fields = ['type_size', 'size']
+        model = CustomerAddress
+        fields = ['street_address', 'province', 'district', 'subdistrict', 'postal_code']
 
-class ProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = ['image']
+class OrderSerializer(serializers.ModelSerializer):
+    customer = serializers.StringRelatedField()
+    promotion = serializers.StringRelatedField()
+    products = ProductSerializer(many=True, read_only=True)
 
-class ProductSerializer(serializers.ModelSerializer):
-    images = ProductImageSerializer(many=True, read_only=True)
-    sizes = ProductSizeSerializers(many=True, read_only=True, source='size')
-    categories = serializers.SlugRelatedField(
-            many=True, 
-            read_only=True, 
-            slug_field='name'
-        )
     class Meta:
-        model = Product
-        fields = ['id', 'name', 'description', 'brand', 'price', 'color', 'amount', 'categories', 'image', 'sizes', 'images']
+        model = Order
+        fields = ['id', 'customer', 'products', 'total_price', 'order_status', 'payment_status', 'created_at', 'promotion']
+
+class ProductOrderSerializer(serializers.ModelSerializer):
+    product = serializers.StringRelatedField()
+    order = serializers.StringRelatedField()
+
+    class Meta:
+        model = ProductOrder
+        fields = ['order', 'product', 'amount', 'price']
+
+class CartSerializer(serializers.ModelSerializer):
+    customer = serializers.StringRelatedField()
+    product = ProductSerializer()
+
+    class Meta:
+        model = Cart
+        fields = ['customer', 'product', 'amount', 'created_at']

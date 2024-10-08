@@ -29,6 +29,12 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token หมดอายุใน 60 นาที
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Refresh Token อายุ 1 วัน
+}
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,10 +43,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "studforce_customer",
     "rest_framework",
     "corsheaders",
+    "studforce_auth",
+    "studforce_product",
+    "studforce_customer",
+    "rest_framework_simplejwt", 
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
