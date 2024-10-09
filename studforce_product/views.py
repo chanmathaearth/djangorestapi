@@ -17,7 +17,6 @@ class ProductListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        # เพิ่มการเช็คสิทธิ์เฉพาะ admin
         self.check_permissions(request)
         if not request.user.is_staff:
             return Response({'detail': 'Permission denied. Admin only.'}, status=status.HTTP_403_FORBIDDEN)

@@ -5,7 +5,7 @@ from .models import Customer
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['first_name', 'last_name', 'birthdate', 'email', 'phone', 'username', 'password', 'gender']
+        fields = ['id', 'first_name', 'last_name', 'birthdate', 'email', 'username', 'password', 'gender']
     
     def validate_password(self, value):
         return make_password(value)

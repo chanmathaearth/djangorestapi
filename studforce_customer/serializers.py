@@ -7,7 +7,7 @@ from studforce_product.serializers import ProductSerializer
 class CustomerAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerAddress
-        fields = ['street_address', 'province', 'district', 'subdistrict', 'postal_code']
+        fields = ['id', 'customer', 'street_address', 'province', 'district', 'subdistrict', 'postal_code', 'phone_number']
 
 class OrderSerializer(serializers.ModelSerializer):
     customer = serializers.StringRelatedField()
@@ -27,9 +27,6 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         fields = ['order', 'product', 'amount', 'price']
 
 class CartSerializer(serializers.ModelSerializer):
-    customer = serializers.StringRelatedField()
-    product = ProductSerializer()
-
     class Meta:
         model = Cart
-        fields = ['customer', 'product', 'amount', 'created_at']
+        fields = ['id', 'customer', 'product', 'amount', 'type_size', 'size']

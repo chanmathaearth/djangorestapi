@@ -9,7 +9,8 @@ class CustomerAddress(models.Model):
     district = models.CharField(max_length=100, verbose_name="District")
     subdistrict = models.CharField(max_length=100, verbose_name="Subdistrict")
     postal_code = models.CharField(max_length=10, verbose_name="Postal Code")
-
+    phone_number = models.CharField(max_length=15, verbose_name="Phone Number", default="")    
+    
     def __str__(self):
         return f"{self.street_address}, {self.subdistrict}, {self.district}, {self.province}, {self.postal_code}"
 
@@ -38,6 +39,8 @@ class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     amount = models.PositiveIntegerField()
+    type_size = models.CharField(max_length=10, default='EUR')
+    size = models.CharField(max_length=10, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -4,7 +4,10 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from studforce_customer.models import Customer
-from rest_framework_simplejwt.tokens import RefreshToken  # Import JWT token generator
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 class CustomerLoginView(APIView):
     def post(self, request):
@@ -14,7 +17,6 @@ class CustomerLoginView(APIView):
 
         if user:
             if user.is_superuser:
-                # สร้าง JWT token
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'message': 'Login successful',
@@ -29,7 +31,6 @@ class CustomerLoginView(APIView):
             try:
                 customer = Customer.objects.get(username=username)
                 if check_password(password, customer.password):
-                    # สร้าง JWT token สำหรับ customer
                     refresh = RefreshToken.for_user(customer)
                     return Response({
                         'user_id': customer.id,
