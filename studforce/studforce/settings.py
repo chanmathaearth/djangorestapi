@@ -29,6 +29,12 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token หมดอายุใน 60 นาที
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Refresh Token อายุ 1 วัน
+}
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,10 +43,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "studforce_customer",
     "rest_framework",
     "corsheaders",
+    "studforce_auth",
+    "studforce_product",
+    "studforce_customer",
+    "rest_framework_simplejwt",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -53,7 +68,11 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "http://localhost:8000",
+]
 
 ROOT_URLCONF = "studforce.urls"
 
@@ -130,3 +149,20 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# import stripe
+# STRIPE_SECRET_KEY = 'sk_test_51Q7iZMBhZhzEe0URDBhfF4Xs7pWUy0T8kGxG2z6AjKZaV30USgqKCdxsQAL4fJcYINuOyaHyHLbWEf7KOmarysS000ORQUGqAb'
+# stripe.api_key = STRIPE_SECRET_KEY
+
+import os
+from dotenv import load_dotenv
+
+# โหลดไฟล์ .env
+load_dotenv()
+
+# ใช้งานค่าในไฟล์ .env
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+
+
+
